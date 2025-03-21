@@ -16,7 +16,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(cors({
-  origin: ["https://your-project-name.vercel.app"],//https://your-project-name.vercel.app
+  origin: ["https://time-zone-first-project-api.vercel.app.vercel.app"],//https://your-project-name.vercel.app
   method: ["POST", "GET"],
   credentials: true
 }));
