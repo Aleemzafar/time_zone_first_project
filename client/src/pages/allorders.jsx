@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useParams } from 'react-router-dom';
-import Navbar from '../Components/Navbar';
 import Footer from '../Components/footer';
 import Sidebar from '../Components/sidebar';
 
 export default function AllOrders() {
-    const [orders, setOrders] = useState([]);
+    const [orders, setOrders] = useState([]); // Initialize as an empty array
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -18,8 +16,15 @@ export default function AllOrders() {
         axios
             .get(`http://localhost:4001/allorders`)
             .then((response) => {
-                (response.data); // Log the response for debugging
-                setOrders(response.data);
+                console.log("Backend response:", response.data); // Log the response for debugging
+
+                // Ensure the response data is an array
+                if (Array.isArray(response.data)) {
+                    setOrders(response.data);
+                } else {
+                    console.error("Expected an array but got:", response.data);
+                    setOrders([]); // Set orders to an empty array if the response is not an array
+                }
                 setLoading(false);
             })
             .catch((err) => {
@@ -29,18 +34,16 @@ export default function AllOrders() {
             });
     };
 
-
-    const handelshipped = (id) => {
+    const handleShipped = (id) => {
         axios
             .delete(`http://localhost:4001/deleteorder/${id}`)
             .then(() => {
-                setOrders(orders.filter(order => order._id !== id))
+                setOrders(orders.filter(order => order._id !== id)); // Remove the shipped order from the list
                 alert("Order shipped successfully");
-                setLoading(false);
             })
             .catch((err) => {
-                setError("Order not deleted something went wrong ");
-                setLoading(false);
+                console.error("Error deleting order:", err);
+                setError("Failed to delete order. Please try again later.");
             });
     };
 
@@ -65,14 +68,17 @@ export default function AllOrders() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order) => (
-                            order.items.map((item, index) => {
+                        {orders.map((order) => {
+                            // Ensure order.items is an array before calling .map()
+                            const items = Array.isArray(order.items) ? order.items : [];
+
+                            return items.map((item, index) => {
                                 const images = item.images || {};
                                 const itemName = item.itemname || 'N/A';
                                 const quantity = item.quantity || 'N/A';
                                 const itemPrice = item.itemprice || 'N/A';
                                 const total = order.total || 'N/A';
-                                const orderid = order._id ;
+                                const orderId = order._id;
                                 const email = order.email || 'N/A';
                                 const date = order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A';
 
@@ -93,12 +99,17 @@ export default function AllOrders() {
                                         <td>${itemPrice}</td>
                                         <td>${total}</td>
                                         <td>
-                                            <button className="btn btn-success" onClick={() => handelshipped(orderid)}>Shipped</button>
+                                            <button
+                                                className="btn btn-success"
+                                                onClick={() => handleShipped(orderId)}
+                                            >
+                                                Shipped
+                                            </button>
                                         </td>
                                     </tr>
                                 );
-                            })
-                        ))}
+                            });
+                        })}
                     </tbody>
                 </table>
             </div>
