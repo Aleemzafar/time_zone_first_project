@@ -442,7 +442,7 @@ app.delete("/deleteproduct/:id", (req, res) => {
   ItemModel.findByIdAndDelete({ _id: id })
     .then(item => {
       if (!item || item.length === 0) {
-        return res.status(500).json("Product not found");
+        return res.status(500).json("Product not found"); 
       }
       res.json(item);
     })

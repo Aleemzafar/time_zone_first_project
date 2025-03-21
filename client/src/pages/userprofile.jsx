@@ -24,7 +24,7 @@ const UserProfile = () => {
 
 
   const handleDelete = (id) => {
-    axios.delete('http://localhost:4001/deleteUser/' + id)
+    axios.delete(`https://time-zone-first-project-api.vercel.app/deleteUser/` + id)
       .then((result) => {
         (result);
         setUser(result.data);
@@ -39,7 +39,7 @@ const UserProfile = () => {
     ("Sending token:", token); // Add this for debugging
 
     axios
-      .get('http://localhost:4001/userprofile/', {
+      .get(`https://time-zone-first-project-api.vercel.app/userprofile/`, {
         headers: {
           'Authorization': `Bearer ${token}`, // Ensure 'Bearer' is included
         },

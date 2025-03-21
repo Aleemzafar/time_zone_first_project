@@ -22,7 +22,7 @@ export default function ProductDetail() {
     }, [id]);
 
     const fetchItem = () => {
-        axios.get(`http://localhost:4001/itemdetail/${id}`)
+        axios.get(`https://time-zone-first-project-api.vercel.app/itemdetail/${id}`)
             .then((response) => {
                 if (response.data) {
                     setItem(response.data);

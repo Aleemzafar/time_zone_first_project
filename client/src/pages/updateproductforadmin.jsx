@@ -20,7 +20,7 @@ export default function Updateproduct() {
 
     useEffect(() => {
         axios
-            .get(`http://localhost:4001/getUser/${id}`)
+            .get(`https://time-zone-first-project-api.vercel.app/getUser/${id}`)
             .then((result) => {
                 setName(result.data.itemname);
                 setPrice(result.data.itemprice);
@@ -67,7 +67,7 @@ export default function Updateproduct() {
         if (image3) formData.append("image3", image3);
 
         axios
-            .put(`http://localhost:4001/updateproduct/${id}`, formData, {
+            .put(`https://time-zone-first-project-api.vercel.app/updateproduct/${id}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

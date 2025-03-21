@@ -12,7 +12,7 @@ const UserProfiles = () => {
     useEffect(() => {
     
         axios
-          .get(`http://localhost:4001/getUser/${id}`)
+          .get(`https://time-zone-first-project-api.vercel.app/getUser/${id}`)
           .then((response) => {
             setUser(response.data);
             setLoading(false);
