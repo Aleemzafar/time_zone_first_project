@@ -13,7 +13,6 @@
       }
     ],
     "env": {
-      "PORT": "@PORT",
       "NODE_ENV": "@NODE_ENV",
       "MONGODB_URI": "@MONGODB_URI",
       "CLOUDINARY_CLOUD_NAME": "@CLOUDINARY_CLOUD_NAME",
