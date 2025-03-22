@@ -16,7 +16,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(cors({
-  origin: ["https://time-zone-first-project-api.vercel.app.vercel.app"],//https://your-project-name.vercel.app
+  origin: ["https://time-zone-first-project-api.vercel.app.vercel.app"],
   method: ["POST", "GET"],
   credentials: true
 }));
@@ -185,7 +185,6 @@ app.post("/login", (req, res) => {
           res
             .cookie("token", token, {
               httpOnly: true,
-              secure: process.env.NODE_ENV === "production",
               sameSite: "Strict",
             })
             .json({ message: "Login successful", token, user });
