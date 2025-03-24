@@ -16,31 +16,31 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(cors({
-  origin: ["https://time-zone-first-project-api.vercel.app.vercel.app"],//https://your-project-name.vercel.app
-  method: ["POST", "GET"],
-  credentials: true
+  origin: "http://localhost:5173", // Remove the trailing slash
+  methods: ["POST", "GET"]// Use 'methods' instead of 'method'
 }));
+
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true })); 
 
 
 
 const mongoURI = process.env.MONGODB_URI;
 
 if (!mongoURI) {
-    console.error('❌ Error: MONGODB_URI is undefined. Check your .env file.');
-    process.exit(1); // Stop execution if URI is missing
+  console.error('❌ Error: MONGODB_URI is undefined. Check your .env file.');
+  process.exit(1); // Stop execution if URI is missing
 }
 
 mongoose.connect(mongoURI)
-    .then(() => console.log('✅==-=Connected to MongoDB'))
-    .catch(err => {
-        console.error('❌ Connection error:', err.message);
-        process.exit(1); // Stop execution on connection failure
-    });
+  .then(() => console.log('✅==-=Connected to MongoDB'))
+  .catch(err => {
+    console.error('❌ Connection error:', err.message);
+    process.exit(1); // Stop execution on connection failure
+  });
 
 
 
@@ -57,7 +57,7 @@ const verifyUser = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(403).json({ message: "Invalid token" }); 
+      return res.status(403).json({ message: "Invalid token" });
     }
     req.user = decoded;
     next();
@@ -442,7 +442,7 @@ app.delete("/deleteproduct/:id", (req, res) => {
   ItemModel.findByIdAndDelete({ _id: id })
     .then(item => {
       if (!item || item.length === 0) {
-        return res.status(500).json("Product not found"); 
+        return res.status(500).json("Product not found");
       }
       res.json(item);
     })

@@ -24,7 +24,7 @@ export default function NewArrival() {
   }, []);
 
   const fetchnewarrivals = () => {
-    axios.get(`https://time-zone-first-project-api.vercel.app/newarrival`)
+    axios.get(`http://localhost:4001/newarrival`)
       .then((response) => {
         setItems(response.data);
       })

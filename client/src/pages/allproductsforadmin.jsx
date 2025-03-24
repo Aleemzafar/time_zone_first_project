@@ -18,7 +18,7 @@ export default function AllProductsForAdmin() {
 
   const fetchItems = () => {
     axios
-      .get('https://time-zone-first-project-api.vercel.app/allitems')
+      .get('http://localhost:4001/allitems')
       .then((response) => {
         setItems(response.data);
         setLoading(false);
@@ -32,7 +32,7 @@ export default function AllProductsForAdmin() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`https://time-zone-first-project-api.vercel.app/deleteproduct/${id}`)
+      .delete(`http://localhost:4001/deleteproduct/${id}`)
       .then(() => {
         // Remove the deleted item from the state
         setItems(items.filter((item) => item._id !== id));

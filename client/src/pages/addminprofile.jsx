@@ -35,7 +35,7 @@ export default function AdminProfile() {
     }
 
     axios
-      .get(`https://time-zone-first-project-api.vercel.app/userprofile/`, {
+      .get('http://localhost:4001/userprofile/', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

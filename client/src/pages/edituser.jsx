@@ -14,7 +14,7 @@ export default function EditUser() {
 
   useEffect(() => {
     axios
-      .get(`https://time-zone-first-project-api.vercel.app/getUser/${id}`)
+      .get(`http://localhost:4001/getUser/${id}`)
       .then((result) => {
         setUsername(result.data.username);
         setEmail(result.data.email);
@@ -43,7 +43,7 @@ export default function EditUser() {
     }
 
     axios
-      .put(`https://time-zone-first-project-api.vercel.app/updateUser/${id}`, formData, {
+      .put(`http://localhost:4001/updateUser/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

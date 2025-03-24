@@ -27,7 +27,7 @@ export default function CreateAccount() {
     }
 
     axios
-      .post(`https://time-zone-first-project-api.vercel.app/createuser`, formData, {
+      .post(`http://localhost:4001/createuser`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

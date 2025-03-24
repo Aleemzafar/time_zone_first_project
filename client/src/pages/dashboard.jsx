@@ -33,7 +33,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   const countorders = () => {
-    axios.get(`https://time-zone-first-project-api.vercel.app/countorder`)
+    axios.get(`http://localhost:4001/countorder`)
       .then((response) => {
         setOrders(response.data.count);
         setLoading(false);
@@ -44,7 +44,7 @@ const Dashboard = () => {
   }
 
   const countitem = () => {
-    axios.get(`https://time-zone-first-project-api.vercel.app/countitem`)
+    axios.get(`http://localhost:4001/countitem`)
       .then((response) => {
         setItems(response.data.count);
         setLoading(false);
@@ -56,7 +56,7 @@ const Dashboard = () => {
 
   const fetchUsers = () => {
     const token = localStorage.getItem("token");
-    axios.get(`https://time-zone-first-project-api.vercel.app/allusers`, {
+    axios.get(`http://localhost:4001/allusers`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -76,7 +76,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
 
     if (window.confirm("Are you sure you want to delete this user?")) {
-      axios.delete('https://time-zone-first-project-api.vercel.app/deleteUser/' + id, {
+      axios.delete('http://localhost:4001/deleteUser/' + id, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
