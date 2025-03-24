@@ -15,12 +15,9 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-app.use(cors({
-  origin: "http://localhost:5173", // Remove the trailing slash
-  methods: ["POST", "GET"]// Use 'methods' instead of 'method'
-}));
-
-
+app.use(cors());
+ 
+ 
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
