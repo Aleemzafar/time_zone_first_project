@@ -16,34 +16,26 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(cors());
- 
- 
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(bodyParser.urlencoded({ extended: true }));
+
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
 
 
-
-const mongoURI = process.env.MONGODB_URI;
-
-if (!mongoURI) {
-  console.error('❌ Error: MONGODB_URI is undefined. Check your .env file.');
-  process.exit(1); // Stop execution if URI is missing
-}
-
-mongoose.connect(mongoURI)
-  .then(() => console.log('✅==-=Connected to MongoDB'))
-  .catch(err => {
-    console.error('❌ Connection error:', err.message);
-    process.exit(1); // Stop execution on connection failure
-  });
-
-
-
-
-
-
+connectDB();
 
 const verifyUser = (req, res, next) => {
   const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
@@ -469,6 +461,12 @@ app.put("/updateproduct/:id", Itemupload, (req, res) => {
     });
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
-}); 
+// At the end of your index.js file, replace the app.listen with:
+module.exports = app;
+
+// Or for serverless compatibility:
+if (require.main === module) {
+  app.listen(process.env.PORT || 4001, () => {
+    console.log(`Server is running on port ${process.env.PORT || 4001}`);
+  });
+}
