@@ -1,6 +1,5 @@
 import React from 'react'
 import Footer from '../Components/footer'
-import MapComponent from '../Components/mapcomponent'
 import { FaHome, FaEnvelope, FaPhone } from "react-icons/fa";
 export default function Contact() {
     const containerStyle = {
@@ -18,7 +17,6 @@ export default function Contact() {
                 <h1>Contact</h1>
             </div>
             <div className="goolemap">
-                <MapComponent />
             </div>
             <div className='contactmain'>
                 <form className="feedback">
