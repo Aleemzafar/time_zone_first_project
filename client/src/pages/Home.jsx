@@ -24,7 +24,7 @@ export default function NewArrival() {
   }, []);
 
   const fetchnewarrivals = () => {
-    axios.get(`http://localhost:4001/newarrival`)
+    axios.get(`/api/newarrival`)
       .then((response) => {
         setItems(response.data);
       })

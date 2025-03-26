@@ -47,7 +47,7 @@ export default function AddProductForAdmin() {
     if (image3) formData.append("image3", image3); // Append image3 if exists
 
     axios
-      .post(`http://localhost:4001/addnewitem`, formData, {
+      .post(`/api/addnewitem`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

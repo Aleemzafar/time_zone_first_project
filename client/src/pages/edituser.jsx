@@ -14,7 +14,7 @@ export default function EditUser() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:4001/getUser/${id}`)
+      .get(`/api/getUser/${id}`)
       .then((result) => {
         setUsername(result.data.username);
         setEmail(result.data.email);
@@ -43,7 +43,7 @@ export default function EditUser() {
     }
 
     axios
-      .put(`http://localhost:4001/updateUser/${id}`, formData, {
+      .put(`/api/updateUser/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

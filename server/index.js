@@ -461,6 +461,16 @@ app.put("/updateproduct/:id", Itemupload, (req, res) => {
     });
 });
 
+// Serve static files from React in production
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+  });
+}
+
 // At the end of your index.js file, replace the app.listen with:
 module.exports = app;
 

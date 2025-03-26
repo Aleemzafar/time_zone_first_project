@@ -27,7 +27,7 @@ export default function CreateAccount() {
     }
 
     axios
-      .post(`http://localhost:4001/createuser`, formData, {
+      .post(`/api/createuser`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
