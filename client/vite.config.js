@@ -7,7 +7,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: process.env.NODE_ENV === 'production' 
-          ? 'https://your-backend.vercel.app' 
+          ? 'https://time-zone-first-project-api.vercel.app' 
           : 'http://localhost:4001',
         changeOrigin: true,
         secure: false,
