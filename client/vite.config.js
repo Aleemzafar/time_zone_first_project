@@ -1,8 +1,15 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxImportSource: '@emotion/react',
+      babel: {
+        plugins: ['@emotion/babel-plugin'],
+      },
+    }),
+  ],
   server: {
     proxy: {
       '/api': {
@@ -20,16 +27,18 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: process.env.NODE_ENV !== 'production',
     rollupOptions: {
-      external: ['@react-google-maps/api'], // Add this line
+      external: ['@react-google-maps/api'],
     }
   },
   resolve: {
     alias: {
-      // Add this if you're still having issues
       '@react-google-maps/api': '@react-google-maps/api/dist/react-google-maps-api.umd.js'
     }
+  },
+  optimizeDeps: {
+    include: ['@emotion/react', '@emotion/styled'],
   },
   define: {
     'process.env': process.env
   }
-})
+});
