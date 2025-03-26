@@ -1,0 +1,34 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "server/index.js",
+        "use": "@vercel/node"
+      },
+      {
+        "src": "client/package.json",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "dist"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "server/index.js"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "client/dist/$1"
+      }
+    ],
+    "env": {
+      "NODE_ENV": "production",
+      "MONGODB_URI": "@mongodb_uri",
+      "CLOUDINARY_CLOUD_NAME": "@cloudinary_cloud_name",
+      "CLOUDINARY_API_KEY": "@cloudinary_api_key",
+      "CLOUDINARY_API_SECRET": "@cloudinary_api_secret",
+      "JWT_SECRET": "@jwt_secret"
+    }
+  }
