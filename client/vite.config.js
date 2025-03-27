@@ -10,6 +10,18 @@ export default defineConfig({
       },
     }),
   ],
+  // Development server configuration
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4001', // Local backend
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  },
+  // Production build configuration
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -25,5 +37,9 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@emotion/react', '@emotion/styled'],
+  },
+  // Environment variables configuration
+  define: {
+    'process.env': process.env
   }
 });

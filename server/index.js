@@ -24,7 +24,8 @@ const requiredEnvVars = [
   'CLOUDINARY_CLOUD_NAME',
   'CLOUDINARY_API_KEY',
   'CLOUDINARY_API_SECRET',
-  'JWT_SECRET'
+  'JWT_SECRET',
+  "ALLOWED_ORIGINS"
 ];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
@@ -48,16 +49,18 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS configuration
-
-// Simplified CORS setup for Vercel deployment
+// Replace your current CORS setup with this:
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
 
 // Middleware
@@ -65,42 +68,26 @@ app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Database connection with improved settings
+
 const connectDB = async () => {
-  const maxRetries = 5;
-  let retryCount = 0;
-
-  while (retryCount < maxRetries) {
-    try {
-      console.log(`Attempting MongoDB connection (attempt ${retryCount + 1})...`);
-
-      const conn = await mongoose.connect(process.env.MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000,
-        retryWrites: true,
-        w: 'majority'
-      });
-
-      console.log(`MongoDB Connected: ${conn.connection.host}`);
-      return;
-    } catch (error) {
-      retryCount++;
-      console.error(`MongoDB Connection Error (attempt ${retryCount}): ${error.message}`);
-
-      if (retryCount === maxRetries) {
-        console.error('Max retries reached. Exiting...');
-        process.exit(1);
-      }
-
-      // Wait 5 seconds before retrying
-      await new Promise(resolve => setTimeout(resolve, 5000));
-    }
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
+      retryWrites: true,
+      retryReads: true
+    });
+    console.log('MongoDB Connected');
+  } catch (err) {
+    console.error('MongoDB Connection Error:', err.message);
+    // Retry after 5 seconds
+    setTimeout(connectDB, 5000);
   }
 };
+
 connectDB();
- 
 // Cloudinary configuration with enhanced settings
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -190,11 +177,10 @@ const verifyAdmin = (req, res, next) => {
 };
 
 // Health check endpoint
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    database: mongoose.connection.readyState === 1 ? "Connected" : "Disconnected",
-    timestamp: new Date().toISOString()
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    timestamp: new Date()
   });
 });
 

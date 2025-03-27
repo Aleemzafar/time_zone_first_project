@@ -3,7 +3,11 @@
   "builds": [
     {
       "src": "server/index.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaTimeout": 30,
+        "includeFiles": [".env"]
+      }
     },
     {
       "src": "client/package.json",
@@ -15,8 +19,21 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/server/index.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://time-zone-frontend.vercel.app",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    },
+    {
       "src": "/(.*)",
-      "dest": "client/dist/$1"
+      "dest": "client/dist/$1",
+      "headers": {
+        "Cache-Control": "s-maxage=3600, stale-while-revalidate"
+      }
     }
   ],
   "env": {
@@ -27,6 +44,7 @@
     "CLOUDINARY_API_KEY": "357472695797284",
     "CLOUDINARY_API_SECRET": "AE14JZq4gEp7haAtbfO337k7JRs",
     "JWT_SECRET": "its_up_you_is_that_what_ever_you_want_to_wright",
-    "JWT_EXPIRES_IN": "10h"
+    "JWT_EXPIRES_IN": "10h",
+    "ALLOWED_ORIGINS": "http://localhost:5173,https://time-zone-frontend.vercel.app"
   }
 }
