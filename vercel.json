@@ -22,10 +22,13 @@
       "src": "/api/(.*)",
       "dest": "/server/index.js",
       "headers": {
-        "Access-Control-Allow-Origin": "https://time-zone-frontend.vercel.app",
+        "Access-Control-Allow-Origin": ["https://time-zone-frontend.vercel.app"],
         "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-        "Access-Control-Allow-Credentials": "true"
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Expose-Headers": "Content-Length, X-JWT-Token",
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload"
       }
     },
     {
