@@ -49,7 +49,6 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS configuration
-const cors = require('cors');
 
 // Simplified CORS setup for Vercel deployment
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
