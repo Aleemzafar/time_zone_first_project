@@ -52,15 +52,14 @@ app.use(limiter);
 const cors = require('cors');
 
 // Simplified CORS setup for Vercel deployment
-const allowedOrigins = [
-  'http://localhost:5173', // Dev
-  'https://time-zone-frontend.vercel.app' // Prod
-];
-
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
+  origin: [
+    'http://localhost:5173', // For local development
+    'https://time-zone-frontend.vercel.app' // Your production frontend
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Enable if using cookies/auth headers
 }));
 
 // Middleware
@@ -193,7 +192,7 @@ const verifyAdmin = (req, res, next) => {
 };
 
 // Health check endpoint
-app.get("/health", (req, res) => {
+app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "OK",
     database: mongoose.connection.readyState === 1 ? "Connected" : "Disconnected",
@@ -202,7 +201,7 @@ app.get("/health", (req, res) => {
 });
 
 // User Routes
-app.post("/createuser", (req, res) => {
+app.post("/api/createuser", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -242,7 +241,7 @@ app.post("/createuser", (req, res) => {
   });
 });
 
-app.get("/allusers", async (req, res) => {
+app.get("/api/allusers", async (req, res) => {
   try {
     const users = await UserModel.find({ role: { $ne: "admin" } });
     if (!users || users.length === 0) {
@@ -255,7 +254,7 @@ app.get("/allusers", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -291,11 +290,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/dashboard", verifyAdmin, (req, res) => {
+app.get("/api/dashboard", verifyAdmin, (req, res) => {
   res.status(200).json({ message: "Welcome to the admin dashboard" });
 });
 
-app.get("/userprofile", verifyUser, async (req, res) => {
+app.get("/api/userprofile", verifyUser, async (req, res) => {
   try {
     const user = await UserModel.findOne({ email: req.user.email });
     if (!user) {
@@ -308,7 +307,7 @@ app.get("/userprofile", verifyUser, async (req, res) => {
   }
 });
 
-app.get("/search", verifyAdmin, async (req, res) => {
+app.get("/api/search", verifyAdmin, async (req, res) => {
   try {
     const query = req.query.username || "";
     const users = await UserModel.find({ username: { $regex: query, $options: "i" } });
@@ -319,7 +318,7 @@ app.get("/search", verifyAdmin, async (req, res) => {
   }
 });
 
-app.put("/updateUser/:id", (req, res) => {
+app.put("/api/updateUser/:id", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -350,7 +349,7 @@ app.put("/updateUser/:id", (req, res) => {
   });
 });
 
-app.get("/getUser/:id", async (req, res) => {
+app.get("/api/getUser/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const user = await UserModel.findById(id);
@@ -364,7 +363,7 @@ app.get("/getUser/:id", async (req, res) => {
   }
 });
 
-app.delete("/deleteUser/:id", async (req, res) => {
+app.delete("/api/deleteUser/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const user = await UserModel.findByIdAndDelete({ _id: id });
@@ -376,7 +375,7 @@ app.delete("/deleteUser/:id", async (req, res) => {
 });
 
 // Item Routes
-app.post("/addnewitem", (req, res) => {
+app.post("/api/addnewitem", (req, res) => {
   Itemupload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -413,7 +412,7 @@ app.post("/addnewitem", (req, res) => {
   });
 });
 
-app.get("/allitems", async (req, res) => {
+app.get("/api/allitems", async (req, res) => {
   try {
     const items = await ItemModel.find();
     if (!items || items.length === 0) {
@@ -426,7 +425,7 @@ app.get("/allitems", async (req, res) => {
   }
 });
 
-app.get("/itemdetail/:id", async (req, res) => {
+app.get("/api/itemdetail/:id", async (req, res) => {
   try {
     const item = await ItemModel.findOne({ _id: req.params.id });
     if (!item) {
@@ -440,7 +439,7 @@ app.get("/itemdetail/:id", async (req, res) => {
 });
 
 // Order Routes
-app.post("/orders", async (req, res) => {
+app.post("/api/orders", async (req, res) => {
   try {
     const { email, contactNumber, items, total } = req.body;
     const newOrder = new OrderModel({ email, contactNumber, items, total });
@@ -452,7 +451,7 @@ app.post("/orders", async (req, res) => {
   }
 });
 
-app.get("/allorders", async (req, res) => {
+app.get("/api/allorders", async (req, res) => {
   try {
     const orders = await OrderModel.find();
     if (orders.length === 0 || !orders) {
@@ -465,7 +464,7 @@ app.get("/allorders", async (req, res) => {
   }
 });
 
-app.delete("/deleteorder/:id", async (req, res) => {
+app.delete("/api/deleteorder/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const order = await OrderModel.findOneAndDelete({ _id: id });
@@ -477,7 +476,7 @@ app.delete("/deleteorder/:id", async (req, res) => {
 });
 
 // Statistics Routes
-app.get("/countorder", async (req, res) => {
+app.get("/api/countorder", async (req, res) => {
   try {
     const count = await OrderModel.countDocuments();
     res.json({ count });
@@ -487,7 +486,7 @@ app.get("/countorder", async (req, res) => {
   }
 });
 
-app.get("/countitem", async (req, res) => {
+app.get("/api/countitem", async (req, res) => {
   try {
     const count = await ItemModel.countDocuments();
     res.json({ count });
@@ -498,7 +497,7 @@ app.get("/countitem", async (req, res) => {
 });
 
 // Category Routes
-app.get("/newarrival", async (req, res) => {
+app.get("/api/newarrival", async (req, res) => {
   try {
     const item = await ItemModel.find({ category: { $eq: "newarrival" } });
     if (!item || item.length === 0) {
@@ -511,7 +510,7 @@ app.get("/newarrival", async (req, res) => {
   }
 });
 
-app.get("/lowprice", async (req, res) => {
+app.get("/api/lowprice", async (req, res) => {
   try {
     const item = await ItemModel.find({ category: { $eq: "lowprice" } });
     if (!item || item.length === 0) {
@@ -524,7 +523,7 @@ app.get("/lowprice", async (req, res) => {
   }
 });
 
-app.get("/mostpopular", async (req, res) => {
+app.get("/api/mostpopular", async (req, res) => {
   try {
     const item = await ItemModel.find({ category: { $eq: "mostpopular" } });
     if (!item || item.length === 0) {
@@ -538,7 +537,7 @@ app.get("/mostpopular", async (req, res) => {
 });
 
 // Product Management Routes
-app.delete("/deleteproduct/:id", async (req, res) => {
+app.delete("/api/deleteproduct/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const item = await ItemModel.findByIdAndDelete({ _id: id });
@@ -552,7 +551,7 @@ app.delete("/deleteproduct/:id", async (req, res) => {
   }
 });
 
-app.put("/updateproduct/:id", (req, res) => {
+app.put("/api/updateproduct/:id", (req, res) => {
   Itemupload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -605,10 +604,6 @@ app.use((req, res) => {
 module.exports = app;
 
 // Start server if not in Vercel environment
-if (require.main === module) {
-  const PORT = process.env.PORT || 4001;
-  app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode`);
-    console.log(`Listening on port ${PORT}`);
-  });
-}
+app.listen(process.env.PORT || 4001, () => {
+  console.log(`Server running on port ${process.env.PORT || 4001}`);
+});
