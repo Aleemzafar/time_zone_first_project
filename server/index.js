@@ -52,14 +52,13 @@ app.use(limiter);
 const cors = require('cors');
 
 // Simplified CORS setup for Vercel deployment
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173', // For local development
-    'https://time-zone-frontend.vercel.app' // Your production frontend
-  ],
+  origin: allowedOrigins,
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // Enable if using cookies/auth headers
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Middleware
