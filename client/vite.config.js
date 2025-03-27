@@ -10,18 +10,6 @@ export default defineConfig({
       },
     }),
   ],
-  server: {
-    proxy: {
-      '/api': {
-        target: process.env.NODE_ENV === 'production' 
-          ? 'https://time-zone-first-project-api.vercel.app' 
-          : 'http://localhost:4001',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
-  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -37,8 +25,5 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@emotion/react', '@emotion/styled'],
-  },
-  define: {
-    'process.env': process.env
   }
 });

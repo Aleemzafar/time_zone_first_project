@@ -14,7 +14,7 @@ export default function AllOrders() {
 
     const fetchOrders = () => {
         axios
-            .get(`/api/allorders`)
+            .get(`${import.meta.env.VITE_API_BASE_URL}/allorders`)
             .then((response) => {
                 console.log("Backend response:", response.data); // Log the response for debugging
 
@@ -36,7 +36,7 @@ export default function AllOrders() {
 
     const handleShipped = (id) => {
         axios
-            .delete(`/api/deleteorder/${id}`)
+            .delete(`${import.meta.env.VITE_API_BASE_URL}/deleteorder/${id}`)
             .then(() => {
                 setOrders(orders.filter(order => order._id !== id)); // Remove the shipped order from the list
                 alert("Order shipped successfully");

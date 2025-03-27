@@ -47,7 +47,7 @@ export default function AddProductForAdmin() {
     if (image3) formData.append("image3", image3); // Append image3 if exists
 
     axios
-      .post(`/api/addnewitem`, formData, {
+      .post(`${import.meta.env.VITE_API_BASE_URL}/addnewitem`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

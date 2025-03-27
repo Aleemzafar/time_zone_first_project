@@ -18,7 +18,7 @@ export default function AllProductsForAdmin() {
 
   const fetchItems = () => {
     axios
-      .get('/api/allitems')
+      .get(`${import.meta.env.VITE_API_BASE_URL}/allitems`)
       .then((response) => {
         setItems(response.data);
         setLoading(false);
@@ -32,7 +32,7 @@ export default function AllProductsForAdmin() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`/api/deleteproduct/${id}`)
+      .delete(`${import.meta.env.VITE_API_BASE_URL}/deleteproduct/${id}`)
       .then(() => {
         // Remove the deleted item from the state
         setItems(items.filter((item) => item._id !== id));

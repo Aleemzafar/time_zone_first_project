@@ -33,7 +33,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   const countorders = () => {
-    axios.get(`/api/countorder`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/countorder`)
       .then((response) => {
         setOrders(response.data.count);
         setLoading(false);
@@ -44,7 +44,7 @@ const Dashboard = () => {
   }
 
   const countitem = () => {
-    axios.get(`/api/countitem`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/countitem`)
       .then((response) => {
         setItems(response.data.count);
         setLoading(false);
@@ -56,7 +56,7 @@ const Dashboard = () => {
 
   const fetchUsers = () => {
     const token = localStorage.getItem("token");
-    axios.get(`/api/allusers`, {
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/allusers`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -76,7 +76,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
 
     if (window.confirm("Are you sure you want to delete this user?")) {
-      axios.delete('/api/deleteUser/' + id, {
+      axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteUser/` + id, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

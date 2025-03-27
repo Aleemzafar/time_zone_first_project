@@ -35,7 +35,7 @@ export default function AdminProfile() {
     }
 
     axios
-      .get('/api/userprofile/', {
+      .get(`${import.meta.env.VITE_API_BASE_URL}/userprofile/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

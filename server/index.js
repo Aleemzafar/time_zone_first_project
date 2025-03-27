@@ -49,23 +49,18 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS configuration
+const cors = require('cors');
+
+// Simplified CORS setup for Vercel deployment
 const allowedOrigins = [
-  'http://localhost:5173',
-  'https://time-zone-frontend.vercel.app',
-  'https://time-zone-first-project-api.vercel.app'
+  'http://localhost:5173', // Dev
+  'https://time-zone-frontend.vercel.app' // Prod
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
 // Middleware

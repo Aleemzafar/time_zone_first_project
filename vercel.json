@@ -1,39 +1,36 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "server/index.js",
-        "use": "@vercel/node"
-      },
-      {
-        "src": "client/package.json",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "dist"
-        }
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
       }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "server/index.js"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "client/dist/$1",
-        "headers": {
-          "Cache-Control": "s-maxage=3600, stale-while-revalidate"
-        }
-      }
-    ],
-    "env": {
-      "NODE_ENV": "production",
-      "PORT": "4001",
-      "MONGODB_URI": "mongodb+srv://aleemzafar021:v6ksWa6MivW9iAqK@cluster0.4cv0c.mongodb.net/allusers?retryWrites=true&w=majority&appName=Cluster0",
-      "CLOUDINARY_CLOUD_NAME": "dkch2csha",
-      "CLOUDINARY_API_KEY": "357472695797284",
-      "CLOUDINARY_API_SECRET": "AE14JZq4gEp7haAtbfO337k7JRs",
-      "JWT_SECRET": "its_up_you_is_that_what_ever_you_want_to_wright",
-      "JWT_EXPIRES_IN": "10h"
     }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/server/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "client/dist/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "4001",
+    "MONGODB_URI": "mongodb+srv://aleemzafar021:v6ksWa6MivW9iAqK@cluster0.4cv0c.mongodb.net/allusers?retryWrites=true&w=majority&appName=Cluster0",
+    "CLOUDINARY_CLOUD_NAME": "dkch2csha",
+    "CLOUDINARY_API_KEY": "357472695797284",
+    "CLOUDINARY_API_SECRET": "AE14JZq4gEp7haAtbfO337k7JRs",
+    "JWT_SECRET": "its_up_you_is_that_what_ever_you_want_to_wright",
+    "JWT_EXPIRES_IN": "10h"
   }
+}

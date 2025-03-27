@@ -12,7 +12,7 @@ const UserProfiles = () => {
     useEffect(() => {
     
         axios
-          .get(`/api/getUser/${id}`)
+          .get(`${import.meta.env.VITE_API_BASE_URL}/getUser/${id}`)
           .then((response) => {
             setUser(response.data);
             setLoading(false);

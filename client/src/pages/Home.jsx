@@ -24,7 +24,7 @@ export default function NewArrival() {
   }, []);
 
   const fetchnewarrivals = () => {
-    axios.get(`/api/newarrival`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/newarrival`)
       .then((response) => {
         setItems(response.data);
       })

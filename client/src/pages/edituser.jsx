@@ -14,7 +14,7 @@ export default function EditUser() {
 
   useEffect(() => {
     axios
-      .get(`/api/getUser/${id}`)
+      .get(`${import.meta.env.VITE_API_BASE_URL}/getUser/${id}`)
       .then((result) => {
         setUsername(result.data.username);
         setEmail(result.data.email);
@@ -43,7 +43,7 @@ export default function EditUser() {
     }
 
     axios
-      .put(`/api/updateUser/${id}`, formData, {
+      .put(`${import.meta.env.VITE_API_BASE_URL}/updateUser/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

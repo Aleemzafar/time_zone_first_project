@@ -20,7 +20,7 @@ export default function Updateproduct() {
 
     useEffect(() => {
         axios
-            .get(`/api/getUser/${id}`)
+            .get(`${import.meta.env.VITE_API_BASE_URL}/getUser/${id}`)
             .then((result) => {
                 setName(result.data.itemname);
                 setPrice(result.data.itemprice);
@@ -67,7 +67,7 @@ export default function Updateproduct() {
         if (image3) formData.append("image3", image3);
 
         axios
-            .put(`/api/updateproduct/${id}`, formData, {
+            .put(`${import.meta.env.VITE_API_BASE_URL}/updateproduct/${id}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

@@ -27,7 +27,7 @@ export default function CreateAccount() {
     }
 
     axios
-      .post(`/api/createuser`, formData, {
+      .post(`${import.meta.env.VITE_API_BASE_URL}/createuser`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
