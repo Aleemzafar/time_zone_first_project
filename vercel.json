@@ -22,7 +22,7 @@
       "src": "/api/(.*)",
       "dest": "/server/index.js",
       "headers": {
-        "Access-Control-Allow-Origin": ["https://time-zone-frontend.vercel.app"],
+        "Access-Control-Allow-Origin": "https://time-zone-frontend.vercel.app",
         "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Expose-Headers": "Content-Length, X-JWT-Token",
@@ -42,7 +42,7 @@
   "env": {
     "NODE_ENV": "production",
     "PORT": "4001",
-    "MONGODB_URI": "mongodb+srv://aleemzafar021:v6ksWa6MivW9iAqK@cluster0.4cv0c.mongodb.net/allusers?retryWrites=true&w=majority&appName=Cluster0",
+    "MONGODB_URI": "mongodb+srv://[USERNAME]:[PASSWORD]@cluster0.4cv0c.mongodb.net/allusers?retryWrites=true&w=majority&appName=Cluster0",
     "CLOUDINARY_CLOUD_NAME": "dkch2csha",
     "CLOUDINARY_API_KEY": "357472695797284",
     "CLOUDINARY_API_SECRET": "AE14JZq4gEp7haAtbfO337k7JRs",
