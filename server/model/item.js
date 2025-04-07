@@ -12,8 +12,8 @@ const ItemSchema = new mongoose.Schema({
     },
     images: {
       image1: { type: String, required: true }, // Image 1 is required
-      image2: { type: String }, // Image 2 is optional
-      image3: { type: String }, // Image 3 is optional
+      image2: { type: String, required: true }, // Image 2 is optional
+      image3: { type: String,required : true}, // Image 3 is optional
     },
     category: {
       type: String,

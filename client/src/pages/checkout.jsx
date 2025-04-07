@@ -29,7 +29,7 @@ export default function Checkout() {
     ('Order Details:', orderDetails); // Debugging
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderDetails);
+      const response = await axios.post(`http://localhost:4001/orders`, orderDetails);
       alert('Order placed successfully!');
       (response.data);
       clearCart(); // Clear the cart after successful order placement

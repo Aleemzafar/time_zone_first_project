@@ -24,7 +24,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, formData);
+      const response = await axios.post(`http://localhost:4001/login`, formData);
       
       if (response.data) {
         // Store user data in localStorage

@@ -33,7 +33,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   const countorders = () => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/countorder`)
+    axios.get(`http://localhost:4001/countorder`)
       .then((response) => {
         setOrders(response.data.count);
         setLoading(false);
@@ -44,7 +44,7 @@ const Dashboard = () => {
   }
 
   const countitem = () => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/countitem`)
+    axios.get(`http://localhost:4001/countitem`)
       .then((response) => {
         setItems(response.data.count);
         setLoading(false);
@@ -56,7 +56,7 @@ const Dashboard = () => {
 
   const fetchUsers = () => {
     const token = localStorage.getItem("token");
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/allusers`, {
+    axios.get(`http://localhost:4001/allusers`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -76,7 +76,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
 
     if (window.confirm("Are you sure you want to delete this user?")) {
-      axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteUser/` + id, {
+      axios.delete(`http://localhost:4001/deleteUser/` + id, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -126,9 +126,9 @@ const Dashboard = () => {
         <div className="dashdata">
           <h1>Welcome Admin!</h1>
           <ul>
-            <li className="ball1">All users ({users.length})</li>
-            <li className="ball2">All products({items})</li>
-            <li className="ball3">All orders({orders})</li>
+            <li className="ball1">All users "{users.length}"</li>
+            <li className="ball2">All products"{items}"</li>
+            <li className="ball3">All orders"{orders}"</li>
           </ul>
 
           <h3>User List</h3>

@@ -16,9 +16,9 @@ export default function ProductForShop() {
   // Fetch data when activeLink changes
   useEffect(() => {
     let url = "";
-    if (activeLink === "new-arrivals") url = "http://localhost:4001/newarrival";
-    else if (activeLink === "price-high-to-low") url = "http://localhost:4001/lowprice";
-    else if (activeLink === "most-popular") url = "http://localhost:4001/mostpopular";
+    if (activeLink === "new-arrivals") url = `http://localhost:4001/newarrival`;
+    else if (activeLink === "price-high-to-low") url = `http://localhost:4001/lowprice`;
+    else if (activeLink === "most-popular") url = `http://localhost:4001/mostpopular`;
 
     axios
       .get(url)

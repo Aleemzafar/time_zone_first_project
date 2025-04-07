@@ -35,30 +35,31 @@ export default function AddProductForAdmin() {
     setImage3(e.target.files[0]);
   };
 
-  const handleAddItem = (e) => {
+  const handleAddItem = async (e) => {
     e.preventDefault();
+    
     const formData = new FormData();
-    formData.append("itemname", name);
-    formData.append("itemprice", price);
-    formData.append("category", category);
-    formData.append("detail", detail);
-    if (image1) formData.append("image1", image1); // Append image1 if exists
-    if (image2) formData.append("image2", image2); // Append image2 if exists
-    if (image3) formData.append("image3", image3); // Append image3 if exists
-
-    axios
-      .post(`${import.meta.env.VITE_API_BASE_URL}/addnewitem`, formData, {
+    formData.append('itemname', name);
+    formData.append('itemprice', price);
+    formData.append('category', category);
+    formData.append('detail', detail);
+    if (image1) formData.append('image1', image1);
+    if (image2) formData.append('image2', image2);
+    if (image3) formData.append('image3', image3);
+  
+    try {
+      const response = await axios.post('http://localhost:4001/addnewitem', formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        navigate("/shop");
-      })
-      .catch((err) => {
-        (err);
+          'Content-Type': 'multipart/form-data'
+        }
       });
+      navigate("/shop");
+    } catch (err) {
+      console.error("Error:", err.response?.data || err.message);
+      alert(err.response?.data?.error || "Failed to add item");
+    }
   };
+  
 
   return (
     <div>

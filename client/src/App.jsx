@@ -9,6 +9,7 @@ import Blog from './pages/blog';
 import Login from './pages/loginuser';
 import Contact from './pages/Contact';
 import Updateuser from './pages/edituser';
+import Allproducts from './pages/allproducts';
 import Cart from './pages/cart';
 import CreateAccount from './pages/createaccount';
 import Checkout from './pages/checkout';
@@ -65,6 +66,7 @@ export default function App() {
             />
             <Route path="/about" element={<About />} />
             <Route path="/updateitem/:id" element={<Updateitem />} />
+            <Route path="/allproducts" element={<Allproducts />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/login" element={<Login />} />

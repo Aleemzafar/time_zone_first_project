@@ -62,7 +62,7 @@ export default function Product() {
                   <img src={item.images?.image1} alt={item.itemname} />
                 </div>
                 <h1>{item.itemname}</h1>
-                <p>${item.itemprice}</p>
+                <p>$ {item.itemprice}</p>
               </Link>
             </div>
           ))

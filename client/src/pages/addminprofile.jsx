@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../Components/Navbar";
 import Footer from "../Components/footer";
 import Sidebar from "../Components/sidebar";
 
@@ -35,7 +34,7 @@ export default function AdminProfile() {
     }
 
     axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/userprofile/`, {
+      .get(`http://localhost:4001/userprofile/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -79,7 +78,7 @@ export default function AdminProfile() {
       <div className="profileadmin">
         <div className="profiles">
           <div className="profileimg">
-            <img src={admin.image || "/images/profile.jpg"} alt={admin.username} title={admin.username} />
+            <img src={admin.image || "/images/profileimg.png"} alt={admin.username} title={admin.username} />
           </div>
           <Link to={`/updateUser/${admin._id}`}>
             <button className="btn btn-success">Edit Profile</button>

@@ -15,7 +15,7 @@ export default function Allusersforadmin() {
         fetchUsers();
     }, []);
     const fetchUsers = () => {
-        axios.get(`${import.meta.env.VITE_API_BASE_URL}/allusers`)
+        axios.get(`http://localhost:4001/allusers`)
             .then((result) => {
                 setUsers(result.data);
                 setLoading(false);
@@ -31,7 +31,7 @@ export default function Allusersforadmin() {
         const token = localStorage.getItem('token');
 
         if (window.confirm('Are you sure you want to delete this user?')) {
-            axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteUser/${id}`, {
+            axios.delete(`http://localhost:4001/deleteUser/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(() => {

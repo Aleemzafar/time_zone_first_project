@@ -22,7 +22,7 @@ export default function ProductDetail() {
     }, [id]);
 
     const fetchItem = () => {
-        axios.get(`${import.meta.env.VITE_API_BASE_URL}/itemdetail/${id}`)
+        axios.get(`http://localhost:4001/itemdetail/${id}`)
             .then((response) => {
                 if (response.data) {
                     setItem(response.data);

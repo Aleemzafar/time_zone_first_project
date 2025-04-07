@@ -30,23 +30,11 @@ export default function AllProductsForAdmin() {
       });
   };
 
-  const handleDelete = (id) => {
-    axios
-      .delete(`http://localhost:4001/deleteproduct/${id}`)
-      .then(() => {
-        // Remove the deleted item from the state
-        setItems(items.filter((item) => item._id !== id));
-      })
-      .catch((err) => {
-        console.error('Error deleting item:', err);
-      });
-  };
 
   if (loading) {
     return (
       <div>
-        <Sidebar />
-        <div className="allproductforadmin">
+        <div className="allproductforadmins">
           <div className="loader">
             <span className="bar"></span>
             <span className="bar"></span>
@@ -61,8 +49,7 @@ export default function AllProductsForAdmin() {
   if (error) {
     return (
       <div>
-        <Sidebar />
-        <div className="allproductforadmin">
+        <div className="allproductforadmins">
           <div className="error">{error}</div>
         </div>
         <Footer />
@@ -73,8 +60,7 @@ export default function AllProductsForAdmin() {
   if (items.length === 0) {
     return (
       <div>
-        <Sidebar />
-        <div className="allproductforadmin">
+        <div className="allproductforadmins">
           <div className="error">No items found</div>
         </div>
         <Footer />
@@ -84,8 +70,13 @@ export default function AllProductsForAdmin() {
 
   return (
     <div>
-      <Sidebar />
-      <div className="allproductforadmin">
+       <div className='header'>
+                <h1>All Watches</h1>
+            </div>
+            <div> &nbsp;</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+      <div className="allproductforadmins">
         <div className="popularproduct">
           {items.map((item) => {
             // Define handleAddToCart inside the map function to access the item
@@ -111,15 +102,7 @@ export default function AllProductsForAdmin() {
                     Add to Cart
                   </button>
                 </div>
-                <Link to={`/updateitem/${item._id}`}>
-                  <button className="btn btn-success">Edit</button>
-                </Link>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDelete(item._id)}
-                >
-                  Delete
-                </button>
+               
                 <Link to={`/productdetail/${item._id}`} className="linkwatch">
                   <h1>{item.itemname}</h1>
                 </Link>

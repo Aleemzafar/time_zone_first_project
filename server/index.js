@@ -1,5 +1,5 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -10,85 +10,67 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const hpp = require('hpp');
 
 // Import models
 const UserModel = require('./model/User');
 const ItemModel = require('./model/item');
 const OrderModel = require('./model/order');
-
-const requiredEnvVars = [
-  'MONGODB_URI',
-  'CLOUDINARY_CLOUD_NAME',
-  'CLOUDINARY_API_KEY',
-  'CLOUDINARY_API_SECRET',
-  'JWT_SECRET',
-  "ALLOWED_ORIGINS"
-];
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    console.error(`ERROR: Missing required environment variable: ${envVar}`);
-    process.exit(1);
-  }
-}
+ 
 // Initialize Express app
 const app = express();
 
 // Enhanced security middleware
-app.use(helmet());
-app.use(mongoSanitize());
-app.use(hpp());
+app.use(cors({
+  origin: 'http://localhost:5173', // or your frontend URL
+  credentials: true
+}));
 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Limit each IP to 200 requests per windowMs
-  message: 'Too many requests from this IP, please try again later'
+  max: 100 // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
 
-// Replace your current CORS setup with this:
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
-// Middleware
+// Body parsers
 app.use(express.json({ limit: '50mb' }));
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(cookieParser());
 
+// Connection event listeners
+mongoose.connection.on('connecting', () => {
+  console.log('Connecting to MongoDB...');
+});
 
-const connectDB = async () => {
+mongoose.connection.on('connected', () => {
+  console.log('Connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('Disconnected from MongoDB');
+});
+
+// Connection function
+async function connectDB() {
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 30000,
-      retryWrites: true,
-      retryReads: true
     });
-    console.log('MongoDB Connected');
+    console.log('MongoDB Connected...');
   } catch (err) {
-    console.error('MongoDB Connection Error:', err.message);
-    // Retry after 5 seconds
-    setTimeout(connectDB, 5000);
+    console.error('MongoDB Connection Error:', err);
+    process.exit(1);
   }
-};
+}
 
+// Call connectDB when starting your server
 connectDB();
-// Cloudinary configuration with enhanced settings
+
+// Cloudinary configuration - updated with simpler setup
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -96,47 +78,31 @@ cloudinary.config({
   secure: true
 });
 
-// Multer storage configurations
-const userStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "Time_Zone/users",
-    allowed_formats: ["jpg", "png", "jpeg", "gif"],
-    transformation: [{ width: 500, height: 500, crop: "limit" }]
-  }
-});
+// Cloudinary storage configurations
+const createCloudinaryStorage = (folder) => {
+  return new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: async (req, file) => {
+      return {
+        folder: folder,
+        allowed_formats: ['jpg', 'png', 'jpeg', 'gif']
+      };
+    }
+  });
+};
 
-const itemStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "Time_Zone/items",
-    allowed_formats: ["jpg", "png", "jpeg", "gif"],
-    transformation: [{ width: 1200, height: 1200, crop: "limit" }]
-  }
-});
+const userStorage = createCloudinaryStorage('Time_Zone/users');
+const itemStorage = createCloudinaryStorage('Time_Zone/items');
 
+// Multer upload configurations
 const upload = multer({
   storage: userStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed!'), false);
-    }
-  }
-}).single('image');
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+}).single("image");
 
-const Itemupload = multer({
+const uploadItemImages = multer({
   storage: itemStorage,
-  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB limit
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed!'), false);
-    }
-  }
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB per file
 }).fields([
   { name: 'image1', maxCount: 1 },
   { name: 'image2', maxCount: 1 },
@@ -177,7 +143,7 @@ const verifyAdmin = (req, res, next) => {
 };
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({
     status: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     timestamp: new Date()
@@ -185,9 +151,12 @@ app.get('/api/health', (req, res) => {
 });
 
 // User Routes
-app.post("/api/createuser", (req, res) => {
+app.post("/createuser", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File size too large (max 5MB)' });
+      }
       return res.status(400).json({ error: err.message });
     }
 
@@ -225,10 +194,10 @@ app.post("/api/createuser", (req, res) => {
   });
 });
 
-app.get("/api/allusers", async (req, res) => {
+app.get("/allusers", async (req, res) => {
   try {
     const users = await UserModel.find({ role: { $ne: "admin" } });
-    if (!users || users.length === 0) {
+    if (!users || users.length === 0) { 
       return res.status(404).json({ error: "No User Found" });
     }
     res.json(users);
@@ -238,7 +207,7 @@ app.get("/api/allusers", async (req, res) => {
   }
 });
 
-app.post("/api/login", async (req, res) => {
+app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -274,11 +243,15 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-app.get("/api/dashboard", verifyAdmin, (req, res) => {
+app.get("/logout", (req, res) => {
+  res.clearCookie("token").json({ message: "Logged out successfully" });
+});
+
+app.get("/dashboard", verifyAdmin, (req, res) => {
   res.status(200).json({ message: "Welcome to the admin dashboard" });
 });
 
-app.get("/api/userprofile", verifyUser, async (req, res) => {
+app.get("/userprofile", verifyUser, async (req, res) => {
   try {
     const user = await UserModel.findOne({ email: req.user.email });
     if (!user) {
@@ -291,7 +264,7 @@ app.get("/api/userprofile", verifyUser, async (req, res) => {
   }
 });
 
-app.get("/api/search", verifyAdmin, async (req, res) => {
+app.get("/search", verifyAdmin, async (req, res) => {
   try {
     const query = req.query.username || "";
     const users = await UserModel.find({ username: { $regex: query, $options: "i" } });
@@ -302,7 +275,7 @@ app.get("/api/search", verifyAdmin, async (req, res) => {
   }
 });
 
-app.put("/api/updateUser/:id", (req, res) => {
+app.put("/updateUser/:id", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -333,7 +306,7 @@ app.put("/api/updateUser/:id", (req, res) => {
   });
 });
 
-app.get("/api/getUser/:id", async (req, res) => {
+app.get("/getUser/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const user = await UserModel.findById(id);
@@ -347,7 +320,7 @@ app.get("/api/getUser/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/deleteUser/:id", async (req, res) => {
+app.delete("/deleteUser/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const user = await UserModel.findByIdAndDelete({ _id: id });
@@ -359,19 +332,26 @@ app.delete("/api/deleteUser/:id", async (req, res) => {
 });
 
 // Item Routes
-app.post("/api/addnewitem", (req, res) => {
-  Itemupload(req, res, async (err) => {
+app.post("/addnewitem", (req, res) => {
+  uploadItemImages(req, res, async (err) => {
     if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File size too large (max 5MB per file)' });
+      }
       return res.status(400).json({ error: err.message });
     }
 
     try {
       const { itemname, itemprice, category, detail } = req.body;
-      const image1 = req.files?.image1?.[0]?.path || null;
-      const image2 = req.files?.image2?.[0]?.path || null;
-      const image3 = req.files?.image3?.[0]?.path || null;
+      
+      // Get file paths if they exist
+      const images = {
+        image1: req.files?.image1?.[0]?.path || null,
+        image2: req.files?.image2?.[0]?.path || null,
+        image3: req.files?.image3?.[0]?.path || null
+      };
 
-      if (!itemname || !itemprice || !category || !detail || !image1) {
+      if (!itemname || !itemprice || !category || !detail || !images.image1) {
         return res.status(400).json({ error: "All fields are required, and at least one image must be uploaded" });
       }
 
@@ -384,7 +364,7 @@ app.post("/api/addnewitem", (req, res) => {
         itemname,
         detail,
         itemprice: parseFloat(itemprice),
-        images: { image1, image2, image3 },
+        images,
         category,
       });
 
@@ -396,7 +376,7 @@ app.post("/api/addnewitem", (req, res) => {
   });
 });
 
-app.get("/api/allitems", async (req, res) => {
+app.get("/allitems", async (req, res) => {
   try {
     const items = await ItemModel.find();
     if (!items || items.length === 0) {
@@ -409,7 +389,7 @@ app.get("/api/allitems", async (req, res) => {
   }
 });
 
-app.get("/api/itemdetail/:id", async (req, res) => {
+app.get("/itemdetail/:id", async (req, res) => {
   try {
     const item = await ItemModel.findOne({ _id: req.params.id });
     if (!item) {
@@ -423,7 +403,7 @@ app.get("/api/itemdetail/:id", async (req, res) => {
 });
 
 // Order Routes
-app.post("/api/orders", async (req, res) => {
+app.post("/orders", async (req, res) => {
   try {
     const { email, contactNumber, items, total } = req.body;
     const newOrder = new OrderModel({ email, contactNumber, items, total });
@@ -435,7 +415,7 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
-app.get("/api/allorders", async (req, res) => {
+app.get("/allorders", async (req, res) => {
   try {
     const orders = await OrderModel.find();
     if (orders.length === 0 || !orders) {
@@ -448,7 +428,7 @@ app.get("/api/allorders", async (req, res) => {
   }
 });
 
-app.delete("/api/deleteorder/:id", async (req, res) => {
+app.delete("/deleteorder/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const order = await OrderModel.findOneAndDelete({ _id: id });
@@ -460,7 +440,7 @@ app.delete("/api/deleteorder/:id", async (req, res) => {
 });
 
 // Statistics Routes
-app.get("/api/countorder", async (req, res) => {
+app.get("/countorder", async (req, res) => {
   try {
     const count = await OrderModel.countDocuments();
     res.json({ count });
@@ -470,7 +450,7 @@ app.get("/api/countorder", async (req, res) => {
   }
 });
 
-app.get("/api/countitem", async (req, res) => {
+app.get("/countitem", async (req, res) => {
   try {
     const count = await ItemModel.countDocuments();
     res.json({ count });
@@ -481,7 +461,7 @@ app.get("/api/countitem", async (req, res) => {
 });
 
 // Category Routes
-app.get("/api/newarrival", async (req, res) => {
+app.get("/newarrival", async (req, res) => {
   try {
     const item = await ItemModel.find({ category: { $eq: "newarrival" } });
     if (!item || item.length === 0) {
@@ -494,7 +474,7 @@ app.get("/api/newarrival", async (req, res) => {
   }
 });
 
-app.get("/api/lowprice", async (req, res) => {
+app.get("/lowprice", async (req, res) => {
   try {
     const item = await ItemModel.find({ category: { $eq: "lowprice" } });
     if (!item || item.length === 0) {
@@ -507,7 +487,7 @@ app.get("/api/lowprice", async (req, res) => {
   }
 });
 
-app.get("/api/mostpopular", async (req, res) => {
+app.get("/mostpopular", async (req, res) => {
   try {
     const item = await ItemModel.find({ category: { $eq: "mostpopular" } });
     if (!item || item.length === 0) {
@@ -521,12 +501,12 @@ app.get("/api/mostpopular", async (req, res) => {
 });
 
 // Product Management Routes
-app.delete("/api/deleteproduct/:id", async (req, res) => {
+app.delete("/deleteproduct/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const item = await ItemModel.findByIdAndDelete({ _id: id });
-    if (!item || item.length === 0) {
-      return res.status(500).json("Product not found");
+    if (!item) {
+      return res.status(404).json("Product not found");
     }
     res.json(item);
   } catch (err) {
@@ -535,8 +515,8 @@ app.delete("/api/deleteproduct/:id", async (req, res) => {
   }
 });
 
-app.put("/api/updateproduct/:id", (req, res) => {
-  Itemupload(req, res, async (err) => {
+app.put("/updateproduct/:id", (req, res) => {
+  uploadItemImages(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
@@ -544,15 +524,21 @@ app.put("/api/updateproduct/:id", (req, res) => {
     try {
       const id = req.params.id;
       const { itemname, itemprice, category, detail } = req.body;
-      const updateProduct = { itemname, itemprice, detail, category };
+      const updateData = { itemname, itemprice, category, detail };
 
+      // Update images if they were uploaded
       if (req.files) {
-        if (req.files.image1) updateProduct.image1 = req.files.image1[0].path;
-        if (req.files.image2) updateProduct.image2 = req.files.image2[0].path;
-        if (req.files.image3) updateProduct.image3 = req.files.image3[0].path;
+        if (req.files.image1) updateData['images.image1'] = req.files.image1[0].path;
+        if (req.files.image2) updateData['images.image2'] = req.files.image2[0].path;
+        if (req.files.image3) updateData['images.image3'] = req.files.image3[0].path;
       }
 
-      const item = await ItemModel.findByIdAndUpdate(id, updateProduct, { new: true });
+      const item = await ItemModel.findByIdAndUpdate(
+        id, 
+        { $set: updateData },
+        { new: true }
+      );
+      
       if (!item) {
         return res.status(404).json({ message: "Item not found" });
       }
@@ -563,15 +549,6 @@ app.put("/api/updateproduct/:id", (req, res) => {
     }
   });
 });
-
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../client/dist')));
-
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../client/dist', 'index.html'));
-  });
-}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -584,10 +561,10 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Export for Vercel
-module.exports = app;
-
-// Start server if not in Vercel environment
-app.listen(process.env.PORT || 4001, () => {
-  console.log(`Server running on port ${process.env.PORT || 4001}`);
+// Start server
+const PORT = process.env.PORT || 4001; 
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;

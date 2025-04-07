@@ -262,7 +262,9 @@ body {
     gap: 10px;
 }
 
-
+.linkarrival {
+    text-decoration: none;
+}
 .arrivalone {
     display: inline-block;
     text-align: center;
@@ -2095,6 +2097,9 @@ form .updatecartbutton {
     margin: 20px;
 }
 
+.allproductforadmins {
+    padding: 0px 0px 0px 0px;
+}
 .allproductforadmin {
     padding: 0px 0px 0px 100px;
 }
